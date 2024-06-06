@@ -1,5 +1,9 @@
 package com.example.form;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
 /**
  * 管理者情報登録時に使用するフォーム.
  * 
@@ -8,10 +12,15 @@ package com.example.form;
  */
 public class InsertAdministratorForm {
 	/** 名前 */
+	@NotBlank
 	private String name;
 	/** メールアドレス */
+	@NotBlank
+	@Email
 	private String mailAddress;
 	/** パスワード */
+	@NotBlank
+	@Min(value = 6, message = "6桁以上のパスワードに設定してください")
 	private String password;
 
 	public String getName() {

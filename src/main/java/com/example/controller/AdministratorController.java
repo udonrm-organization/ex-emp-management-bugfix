@@ -73,6 +73,9 @@ public class AdministratorController {
 	 */
 	@PostMapping("/insert")
 	public String insert(InsertAdministratorForm form) {
+		if(administratorService.findByMailAddress(form.getMailAddress()) != null){
+			return "administrator/insert";
+		}
 		Administrator administrator = new Administrator();
 		// フォームからドメインにプロパティ値をコピー
 		BeanUtils.copyProperties(form, administrator);

@@ -3,6 +3,7 @@ package com.example.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,8 @@ import com.example.form.LoginForm;
 import com.example.service.AdministratorService;
 
 import jakarta.servlet.http.HttpSession;
+
+import java.util.Objects;
 
 /**
  * 管理者情報を操作するコントローラー.
@@ -66,12 +69,18 @@ public class AdministratorController {
    */
   @PostMapping("/insert")
   public String insert(@Validated InsertAdministratorForm form, BindingResult result) {
+    if (!Objects.equals(form.getPassword(), form.getPasswordConfirmation())) {
+      result.rejectValue("password", "", "入力されたパスワードと一致しません");
+    }
+
     if (administratorService.findByMailAddress(form.getMailAddress()) != null) {
       result.rejectValue("mailAddress", "", "Eメールアドレスが重複しています");
     }
+
     if (result.hasErrors()) {
       return toInsert();
     }
+    
     Administrator administrator = new Administrator();
     // フォームからドメインにプロパティ値をコピー
     BeanUtils.copyProperties(form, administrator);

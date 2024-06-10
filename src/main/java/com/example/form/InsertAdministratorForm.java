@@ -28,6 +28,9 @@ public class InsertAdministratorForm {
   @Size(min = 6, message = "6桁以上のパスワードに設定してください")
   private String password;
 
+  @NotBlank
+  private String passwordConfirmation;
+
   public String getName() {
     return name;
   }
@@ -52,10 +55,21 @@ public class InsertAdministratorForm {
     this.password = password;
   }
 
-  @Override
-  public String toString() {
-    return "InsertAdministratorForm [name=" + name + ", mailAddress=" + mailAddress + ", password=" + password
-            + "]";
+  public String getPasswordConfirmation() {
+    return passwordConfirmation;
   }
 
+  public void setPasswordConfirmation(String passwordConfirmation) {
+    this.passwordConfirmation = passwordConfirmation;
+  }
+
+  @Override
+  public String toString() {
+    return "InsertAdministratorForm{" +
+            "name='" + name + '\'' +
+            ", mailAddress='" + mailAddress + '\'' +
+            ", password='" + password + '\'' +
+            ", passwordConfirmation='" + passwordConfirmation + '\'' +
+            '}';
+  }
 }

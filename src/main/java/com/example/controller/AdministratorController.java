@@ -79,7 +79,7 @@ public class AdministratorController {
   @PostMapping("/insert")
   public String insert(@Validated InsertAdministratorForm form, BindingResult result, Model model) {
     if (!Objects.equals(form.getPassword(), form.getPasswordConfirmation())) {
-      model.addAttribute("duplicationMessage", "入力されたパスワードと一致しません");
+      result.rejectValue("password", "","入力されたパスワードと一致しません" );
       return toInsert();
     }
 

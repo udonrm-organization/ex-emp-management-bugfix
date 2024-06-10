@@ -3,9 +3,9 @@ package com.example.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpSession;
  * 管理者情報を操作するコントローラー.
  *
  * @author igamasayuki
+ *
  */
 @Controller
 @RequestMapping("/")
@@ -58,16 +59,6 @@ public class AdministratorController {
   /////////////////////////////////////////////////////
 
   /**
-   * 管理者登録画面を出力します.
-   *
-   * @return 管理者登録画面
-   */
-  @GetMapping("/toInsert")
-  public String toInsert() {
-    return "administrator/insert";
-  }
-
-  /**
    * 管理者情報を登録します.
    *
    * @param form 管理者情報用フォーム
@@ -75,6 +66,9 @@ public class AdministratorController {
    */
   @PostMapping("/insert")
   public String insert(@Validated InsertAdministratorForm form, BindingResult result) {
+    if (administratorService.findByMailAddress(form.getMailAddress()) != null) {
+      result.rejectValue("mailAddress", "", "Eメールアドレスが重複しています");
+    }
     if (result.hasErrors()) {
       return toInsert();
     }
@@ -84,6 +78,17 @@ public class AdministratorController {
     administratorService.insert(administrator);
     return "redirect:/";
   }
+
+  /**
+   * 管理者登録画面を出力します.
+   *
+   * @return 管理者登録画面
+   */
+  @GetMapping("/toInsert")
+  public String toInsert() {
+    return "administrator/insert";
+  }
+
 
   /////////////////////////////////////////////////////
   // ユースケース：ログインをする
@@ -99,22 +104,21 @@ public class AdministratorController {
     return "administrator/login";
   }
 
-  /**
-   * ログインします.
-   *
-   * @param form 管理者情報用フォーム
-   * @return ログイン後の従業員一覧画面
-   */
-  @PostMapping("/login")
-  public String login(LoginForm form, RedirectAttributes redirectAttributes) {
-    Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-    session.setAttribute("administratorName", administrator.getName());
-    if (administrator == null) {
-      redirectAttributes.addFlashAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
-      return "redirect:/";
-    }
-    return "redirect:/employee/showList";
-  }
+	/**
+	 * ログインします.
+	 * 
+	 * @param form 管理者情報用フォーム
+	 * @return ログイン後の従業員一覧画面
+	 */
+	@PostMapping("/login")
+	public String login(LoginForm form, RedirectAttributes redirectAttributes) {
+		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
+		if (administrator == null) {
+			redirectAttributes.addFlashAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
+			return "redirect:/";
+		}
+		return "redirect:/employee/showList";
+	}
 
   /////////////////////////////////////////////////////
   // ユースケース：ログアウトをする

@@ -2,6 +2,8 @@ package com.example.controller;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +27,6 @@ import java.util.Objects;
  * 管理者情報を操作するコントローラー.
  *
  * @author igamasayuki
- *
  */
 @Controller
 @RequestMapping("/")
@@ -80,10 +81,13 @@ public class AdministratorController {
     if (result.hasErrors()) {
       return toInsert();
     }
-    
+
     Administrator administrator = new Administrator();
     // フォームからドメインにプロパティ値をコピー
     BeanUtils.copyProperties(form, administrator);
+
+    String hashedPassword = administratorService.hashPassword(administrator.getPassword());
+    administrator.setPassword(hashedPassword);
     administratorService.insert(administrator);
     return "redirect:/";
   }
@@ -113,21 +117,21 @@ public class AdministratorController {
     return "administrator/login";
   }
 
-	/**
-	 * ログインします.
-	 * 
-	 * @param form 管理者情報用フォーム
-	 * @return ログイン後の従業員一覧画面
-	 */
-	@PostMapping("/login")
-	public String login(LoginForm form, RedirectAttributes redirectAttributes) {
-		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-		if (administrator == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
-			return "redirect:/";
-		}
-		return "redirect:/employee/showList";
-	}
+  /**
+   * ログインします.
+   *
+   * @param form 管理者情報用フォーム
+   * @return ログイン後の従業員一覧画面
+   */
+  @PostMapping("/login")
+  public String login(LoginForm form, RedirectAttributes redirectAttributes) {
+    boolean isAuthenticated = administratorService.authenticate(form.getMailAddress(), form.getPassword());
+    if (isAuthenticated) {
+      return "redirect:/employee/showList";
+    }
+    redirectAttributes.addFlashAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
+    return "redirect:/";
+  }
 
   /////////////////////////////////////////////////////
   // ユースケース：ログアウトをする

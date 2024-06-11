@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,5 +103,15 @@ public class EmployeeController {
     employee.setDependentsCount(form.getIntDependentsCount());
     employeeService.update(employee);
     return "redirect:/employee/showList";
+  }
+
+  @ResponseBody
+  @GetMapping("/autoComplete")
+  public List<String> getAutoComplete(String name) {
+    List<String> employeeNameList = new ArrayList<>();
+    for (Employee employee : employeeService.showListByName(name)) {
+      employeeNameList.add(employee.getName());
+    }
+    return employeeNameList;
   }
 }

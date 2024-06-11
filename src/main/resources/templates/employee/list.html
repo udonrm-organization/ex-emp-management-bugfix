@@ -67,7 +67,7 @@
                     </li>
                 </ul>
                 <p class="navbar-text navbar-right">
-              <span th:text="${session.administratorName}">山田太郎</span>さんこんにちは！ &nbsp;&nbsp;&nbsp;
+                    <span th:text="${session.administratorName}">山田太郎</span>さんこんにちは！ &nbsp;&nbsp;&nbsp;
                     <a
                             href="../administrator/login.html"
                             class="navbar-link"
@@ -94,8 +94,8 @@
                 class="table-responsive col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-12 col-xs-12"
         >
             <form method="GET">
-                <label for="name">名前</label>
-                <input type="text" name="name" id="name" th:value="${name}">
+                <label for="searchName">名前</label>
+                <input type="text" name="name" id="searchName" th:value="${name}">
                 <button type="submit" class="btn btn-primary">検索</button>
             </form>
             <span th:text="${NotFoundMessage}"></span>
@@ -139,5 +139,13 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="../../static/js/bootstrap.min.js"></script>
+<script th:src="@{/js/autocomplete.js}"></script>
+<link type="text/css" rel="stylesheet"
+      href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css"/>
+<script type="text/javascript"
+        src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript"
+        src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
 </body>
 </html>

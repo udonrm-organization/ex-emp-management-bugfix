@@ -30,16 +30,9 @@ public class AdministratorService {
    * @param administrator 管理者情報
    */
   public void insert(Administrator administrator) {
+    String hashedPassword = BCrypt.hashpw(administrator.getPassword(), BCrypt.gensalt());
+    administrator.setPassword(hashedPassword);
     administratorRepository.insert(administrator);
-  }
-
-  public boolean authenticate(String mailAddress, String password) {
-    Administrator administrator = administratorRepository.findByMailAddress(mailAddress);
-    if (administrator == null || !BCrypt.checkpw(password, administrator.getPassword())) {
-      return false;
-    }
-    session.setAttribute("administratorName", administrator.getName());
-    return true;
   }
 
   /**
@@ -50,17 +43,21 @@ public class AdministratorService {
    * @return 管理者情報 存在しない場合はnullが返ります
    */
   public Administrator login(String mailAddress, String password) {
-    Administrator administrator = administratorRepository.findByMailAddressAndPassward(mailAddress, password);
+    Administrator administrator = administratorRepository.findByMailAddress(mailAddress);
+    if (administrator == null || !BCrypt.checkpw(password, administrator.getPassword())) {
+      return null;
+    }
     return administrator;
   }
 
+  /**
+   * メールアドレスから管理者を検索します.
+   *
+   * @param mailAddress メールアドレス
+   * @return 管理者
+   */
   public Administrator findByMailAddress(String mailAddress) {
     Administrator administrator = administratorRepository.findByMailAddress(mailAddress);
     return administrator;
-  }
-
-  public String hashPassword(String password) {
-    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-    return hashedPassword;
   }
 }

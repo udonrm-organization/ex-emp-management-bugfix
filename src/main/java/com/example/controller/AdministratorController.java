@@ -85,9 +85,6 @@ public class AdministratorController {
     Administrator administrator = new Administrator();
     // フォームからドメインにプロパティ値をコピー
     BeanUtils.copyProperties(form, administrator);
-
-    String hashedPassword = administratorService.hashPassword(administrator.getPassword());
-    administrator.setPassword(hashedPassword);
     administratorService.insert(administrator);
     return "redirect:/";
   }
@@ -125,8 +122,9 @@ public class AdministratorController {
    */
   @PostMapping("/login")
   public String login(LoginForm form, RedirectAttributes redirectAttributes) {
-    boolean isAuthenticated = administratorService.authenticate(form.getMailAddress(), form.getPassword());
-    if (isAuthenticated) {
+    Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
+    if (administrator != null) {
+      session.setAttribute("administratorName", administrator.getName());
       return "redirect:/employee/showList";
     }
     redirectAttributes.addFlashAttribute("errorMessage", "メールアドレスまたはパスワードが不正です。");
